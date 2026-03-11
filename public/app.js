@@ -1,4 +1,5 @@
-const API_URL = "https://status.claude.com/api/v2/summary.json";
+const SUMMARY_URL = "https://status.claude.com/api/v2/summary.json";
+const INCIDENTS_URL = "https://status.claude.com/api/v2/incidents.json";
 const REFRESH_MS = 60_000;
 
 const $ = (id) => document.getElementById(id);
@@ -26,14 +27,25 @@ function formatDate() {
 }
 
 async function fetchStatus() {
-  const res = await fetch(API_URL);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
+  const [summaryRes, incidentsRes] = await Promise.all([
+    fetch(SUMMARY_URL),
+    fetch(INCIDENTS_URL),
+  ]);
+  if (!summaryRes.ok) throw new Error(`HTTP ${summaryRes.status}`);
+  if (!incidentsRes.ok) throw new Error(`HTTP ${incidentsRes.status}`);
+  const summary = await summaryRes.json();
+  const incidents = await incidentsRes.json();
+  return { ...summary, incidents: incidents.incidents || [] };
+}
+
+function getToday() {
+  const param = new URLSearchParams(window.location.search).get("date");
+  return param ? new Date(param + "T12:00:00") : new Date();
 }
 
 function isToday(dateStr) {
   const d = new Date(dateStr);
-  const now = new Date();
+  const now = getToday();
   return (
     d.getFullYear() === now.getFullYear() &&
     d.getMonth() === now.getMonth() &&
@@ -63,11 +75,19 @@ function deriveAnswer(data) {
   return { isDown, isCurrentlyDown, todayIncidents, data };
 }
 
-function dotClass(status) {
-  if (status === "operational") return "dot-operational";
-  if (status === "degraded_performance") return "dot-degraded";
-  if (status === "partial_outage") return "dot-partial";
-  return "dot-down";
+function currentStatusDot(data) {
+  const hasMajor = (data.components || []).some(
+    (c) =>
+      c.status === "major_outage" || c.status === "partial_outage"
+  );
+  const hasDegraded = (data.components || []).some(
+    (c) => c.status === "degraded_performance"
+  );
+
+  if (hasMajor) return { cls: "status-dot-down", label: "Outage right now" };
+  if (hasDegraded)
+    return { cls: "status-dot-degraded", label: "Degraded right now" };
+  return { cls: "status-dot-ok", label: "All systems operational right now" };
 }
 
 function incidentStatusText(inc) {
@@ -82,7 +102,7 @@ function clearChildren(node) {
 function render({ isDown, isCurrentlyDown, todayIncidents, data }) {
   const answerEl = $("answer");
   const reasonEl = $("reason");
-  const componentsEl = $("components");
+  const statusEl = $("current-status");
   const incidentsEl = $("incidents");
 
   clearChildren(answerEl);
@@ -96,21 +116,16 @@ function render({ isDown, isCurrentlyDown, todayIncidents, data }) {
     document.title = "YES — Was Claude Down Today?";
   } else {
     answerEl.appendChild(el("span", "answer-word answer-no", "NO"));
-    reasonEl.textContent = "All systems operational.";
+    reasonEl.textContent = "No incidents today.";
     document.title = "NO — Was Claude Down Today?";
   }
 
   updateFavicon(isDown);
 
-  clearChildren(componentsEl);
-  (data.components || [])
-    .filter((c) => !c.group_id && c.name !== "Visit https://claude.ai")
-    .forEach((c) => {
-      const span = el("span", "component");
-      span.appendChild(el("span", `component-dot ${dotClass(c.status)}`));
-      span.appendChild(document.createTextNode(c.name));
-      componentsEl.appendChild(span);
-    });
+  clearChildren(statusEl);
+  const status = currentStatusDot(data);
+  statusEl.appendChild(el("span", `status-dot ${status.cls}`));
+  statusEl.appendChild(document.createTextNode(status.label));
 
   clearChildren(incidentsEl);
   if (todayIncidents.length > 0) {

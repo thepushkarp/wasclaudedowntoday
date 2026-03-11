@@ -34,17 +34,9 @@ main {
   width: 100%;
 }
 
-h1 {
-  font-size: clamp(1.4rem, 4vw, 1.8rem);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: var(--text);
-}
-
 .date {
   color: var(--muted);
   font-size: 0.9rem;
-  margin-top: 0.4rem;
 }
 
 .answer {
@@ -83,41 +75,32 @@ h1 {
   margin-bottom: 2rem;
 }
 
-.components {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.6rem 1.4rem;
+.current-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--muted);
+  font-size: 0.8rem;
   margin-bottom: 2rem;
 }
 
-.component {
-  font-size: 0.85rem;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  white-space: nowrap;
-}
-
-.component-dot {
-  width: 8px;
-  height: 8px;
+.status-dot {
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
+  display: inline-block;
   flex-shrink: 0;
 }
 
-.dot-operational {
+.status-dot-ok {
   background: var(--green);
 }
 
-.dot-degraded,
-.dot-partial {
+.status-dot-degraded {
   background: var(--accent);
 }
 
-.dot-major,
-.dot-down {
+.status-dot-down {
   background: #c0392b;
 }
 
@@ -157,7 +140,11 @@ h1 {
 }
 
 footer {
-  margin-top: 1rem;
+  position: fixed;
+  bottom: 1.5rem;
+  left: 0;
+  right: 0;
+  text-align: center;
 }
 
 footer a {
