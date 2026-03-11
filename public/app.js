@@ -4,6 +4,29 @@ const REFRESH_MS = 60_000;
 
 const $ = (id) => document.getElementById(id);
 
+const QUIPS_NO = [
+  "You can go back to pretending you wrote that code yourself.",
+  "Your job is safe... for now.",
+  "All clear. Continue taking credit for Claude's work.",
+];
+
+const QUIPS_YES_ACTIVE = [
+  "Time to find out if you actually know how to code.",
+  "Guess you'll have to read the docs yourself today.",
+  "Hope you remember how Stack Overflow works.",
+  "This is the part where you stare at your screen.",
+];
+
+const QUIPS_YES_RESOLVED = [
+  "It was down, but it got back up. Unlike your motivation.",
+  "There was a blip. Nobody saw you panic. Right?",
+  "It's back. You can close that Stack Overflow tab now.",
+];
+
+function pick(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
 function el(tag, className, text) {
   const node = document.createElement(tag);
   if (className) node.className = className;
@@ -106,12 +129,12 @@ function render({ isDown, isCurrentlyDown, todayIncidents, data }) {
     const cls = isCurrentlyDown ? "answer-yes" : "answer-yes-resolved";
     answerEl.appendChild(el("span", `answer-word ${cls}`, "YES"));
     reasonEl.textContent = isCurrentlyDown
-      ? "There are ongoing issues."
-      : "There were issues earlier today, now resolved.";
+      ? pick(QUIPS_YES_ACTIVE)
+      : pick(QUIPS_YES_RESOLVED);
     document.title = "YES — Was Claude Down Today?";
   } else {
     answerEl.appendChild(el("span", "answer-word answer-no", "NO"));
-    reasonEl.textContent = "No incidents today.";
+    reasonEl.textContent = pick(QUIPS_NO);
     document.title = "NO — Was Claude Down Today?";
   }
 
