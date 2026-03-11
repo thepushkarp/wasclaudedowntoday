@@ -1,12 +1,12 @@
 const SUMMARY_URL = "https://status.claude.com/api/v2/summary.json";
 const INCIDENTS_URL = "https://status.claude.com/api/v2/incidents.json";
 
-function isSameDay(dateStr, ref) {
+function isSameDayUTC(dateStr, ref) {
   const d = new Date(dateStr);
   return (
-    d.getFullYear() === ref.getFullYear() &&
-    d.getMonth() === ref.getMonth() &&
-    d.getDate() === ref.getDate()
+    d.getUTCFullYear() === ref.getUTCFullYear() &&
+    d.getUTCMonth() === ref.getUTCMonth() &&
+    d.getUTCDate() === ref.getUTCDate()
   );
 }
 
@@ -25,17 +25,14 @@ export default async function handler(req, res) {
     const summary = await summaryRes.json();
     const incidents = await incidentsRes.json();
 
-    const dateParam = req.query.date;
-    const today = dateParam
-      ? new Date(dateParam + "T12:00:00")
-      : new Date();
+    const today = new Date();
 
     const todayIncidents = (incidents.incidents || []).filter(
       (inc) =>
-        isSameDay(inc.created_at, today) ||
-        isSameDay(inc.updated_at, today) ||
+        isSameDayUTC(inc.created_at, today) ||
+        isSameDayUTC(inc.updated_at, today) ||
         (inc.incident_updates || []).some((u) =>
-          isSameDay(u.created_at, today)
+          isSameDayUTC(u.created_at, today)
         )
     );
 

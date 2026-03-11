@@ -38,14 +38,9 @@ async function fetchStatus() {
   return { ...summary, incidents: incidents.incidents || [] };
 }
 
-function getToday() {
-  const param = new URLSearchParams(window.location.search).get("date");
-  return param ? new Date(param + "T12:00:00") : new Date();
-}
-
 function isToday(dateStr) {
   const d = new Date(dateStr);
-  const now = getToday();
+  const now = new Date();
   return (
     d.getFullYear() === now.getFullYear() &&
     d.getMonth() === now.getMonth() &&
