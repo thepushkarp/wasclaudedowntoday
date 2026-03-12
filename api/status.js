@@ -2,22 +2,35 @@ const SUMMARY_URL = "https://status.claude.com/api/v2/summary.json";
 const INCIDENTS_URL = "https://status.claude.com/api/v2/incidents.json";
 
 const QUIPS_NO = [
-  "You can go back to pretending you wrote that code yourself.",
-  "Your job is safe... for now.",
-  "All clear. Continue taking credit for Claude's work.",
+    'You can go back to pretending you wrote that code yourself.',
+    'Your job is safe... for now.',
+    "All clear. Continue taking credit for Claude's work.",
+    "Still up. Nobody has to discover your fallback plan was 'guessing'.",
+    'No outage today. Your impostor syndrome lives to fight another day.',
+    'Crisis averted. You may resume outsourcing your thoughts.',
 ];
 
 const QUIPS_YES_ACTIVE = [
-  "Time to find out if you actually know how to code.",
-  "Guess you'll have to read the docs yourself today.",
-  "Hope you remember how Stack Overflow works.",
-  "This is the part where you stare at your screen.",
+    'Time to find out if you actually know how to code.',
+    "Guess you'll have to read the docs yourself today.",
+    'Hope you remember how Stack Overflow works.',
+    'This is the part where you stare at your screen.',
+    "Looks like it's just you and your raw problem-solving skills now.",
+    'Claude is down. Time to cosplay as a competent engineer.',
+    "Hope you weren't too emotionally attached to AI writing your code.",
+    "You're on your own for a bit. Terrifying, I know.",
+    'Time to interact directly with the codebase. Condolences.',
+    'Claude is unavailable, which makes this a very hands-on learning experience.',
 ];
 
 const QUIPS_YES_RESOLVED = [
-  "It was down, but it got back up. Unlike your motivation.",
-  "There was a blip. Nobody saw you panic. Right?",
-  "It's back. You can close that Stack Overflow tab now.",
+    'It was down, but it got back up. Unlike your motivation.',
+    'There was a blip. Nobody saw you panic. Right?',
+    "It's back. You can close that Stack Overflow tab now.",
+    "It broke, you spiraled, and now it's back. Beautiful arc.",
+    'Claude recovered. Pretend you were calm the whole time.',
+    "Everything's working again. That was a rough time for your confidence.",
+    'Resolved. Your temporary career in manual thinking is over.',
 ];
 
 function pick(arr) {
