@@ -209,12 +209,25 @@ function renderError() {
   document.title = "Was Claude Down Today?";
 }
 
-async function refresh() {
+async function refresh({ spin = false } = {}) {
+  const btn = $("refresh-btn");
+  const icon = $("refresh-icon");
+
+  if (spin && btn) {
+    btn.disabled = true;
+    icon.classList.add("spinning");
+  }
+
   try {
     const data = await fetchStatus();
     render(deriveAnswer(data));
   } catch {
     renderError();
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      icon.classList.remove("spinning");
+    }
   }
 }
 
@@ -223,6 +236,11 @@ function init() {
   setInterval(() => {
     $("date").textContent = formatDate();
   }, 30_000);
+
+  const btn = $("refresh-btn");
+  if (btn) {
+    btn.addEventListener("click", () => refresh({ spin: true }));
+  }
 
   refresh();
   setInterval(refresh, REFRESH_MS);
