@@ -4,6 +4,15 @@ const REFRESH_MS = 60_000;
 
 const $ = (id) => document.getElementById(id);
 
+function initTheme() {
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", prefersDark ? "dark" : "light");
+
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
+    document.documentElement.setAttribute("data-theme", e.matches ? "dark" : "light");
+  });
+}
+
 const QUIPS_NO = [
   "You can go back to pretending you wrote that code yourself.",
   "Your job is safe... for now.",
@@ -232,6 +241,8 @@ async function refresh({ spin = false } = {}) {
 }
 
 function init() {
+  initTheme();
+
   $("date").textContent = formatDate();
   setInterval(() => {
     $("date").textContent = formatDate();
