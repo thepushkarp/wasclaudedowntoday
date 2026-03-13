@@ -5,12 +5,14 @@ const REFRESH_MS = 60_000;
 const $ = (id) => document.getElementById(id);
 
 function initTheme() {
-  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  document.documentElement.setAttribute("data-theme", prefersDark ? "dark" : "light");
+  const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
+  function updateTheme(e) {
     document.documentElement.setAttribute("data-theme", e.matches ? "dark" : "light");
-  });
+  }
+
+  updateTheme(mediaQuery);
+  mediaQuery.addEventListener("change", updateTheme);
 }
 
 const QUIPS_NO = [
