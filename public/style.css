@@ -8,6 +8,15 @@
   --font: "Poppins", system-ui, sans-serif;
 }
 
+[data-theme="dark"] {
+  --bg: #141413;
+  --text: #faf9f5;
+  --muted: #7a7163;
+  --accent: #e89578;
+  --green: #8fa56f;
+  --border: #2d2a26;
+}
+
 *,
 *::before,
 *::after {

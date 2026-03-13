@@ -4,6 +4,17 @@ const REFRESH_MS = 60_000;
 
 const $ = (id) => document.getElementById(id);
 
+function initTheme() {
+  const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+  function updateTheme(e) {
+    document.documentElement.setAttribute("data-theme", e.matches ? "dark" : "light");
+  }
+
+  updateTheme(mediaQuery);
+  mediaQuery.addEventListener("change", updateTheme);
+}
+
 const QUIPS_NO = [
   "You can go back to pretending you wrote that code yourself.",
   "Your job is safe... for now.",
@@ -232,6 +243,8 @@ async function refresh({ spin = false } = {}) {
 }
 
 function init() {
+  initTheme();
+
   $("date").textContent = formatDate();
   setInterval(() => {
     $("date").textContent = formatDate();
