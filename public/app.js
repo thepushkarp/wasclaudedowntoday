@@ -8,6 +8,9 @@ const QUIPS_NO = [
   "You can go back to pretending you wrote that code yourself.",
   "Your job is safe... for now.",
   "All clear. Continue taking credit for Claude's work.",
+  "Still up. Nobody has to discover your fallback plan was 'guessing'.",
+  "No outage today. Your impostor syndrome lives to fight another day.",
+  "Crisis averted. You may resume outsourcing your thoughts.",
 ];
 
 const QUIPS_YES_ACTIVE = [
@@ -15,16 +18,34 @@ const QUIPS_YES_ACTIVE = [
   "Guess you'll have to read the docs yourself today.",
   "Hope you remember how Stack Overflow works.",
   "This is the part where you stare at your screen.",
+  "Looks like it's just you and your raw problem-solving skills now.",
+  "Claude is down. Time to cosplay as a competent engineer.",
+  "Hope you weren't too emotionally attached to AI writing your code.",
+  "You're on your own for a bit. Terrifying, I know.",
+  "Time to interact directly with the codebase. Condolences.",
+  "Claude is unavailable, which makes this a very hands-on learning experience.",
 ];
 
 const QUIPS_YES_RESOLVED = [
   "It was down, but it got back up. Unlike your motivation.",
   "There was a blip. Nobody saw you panic. Right?",
   "It's back. You can close that Stack Overflow tab now.",
+  "It broke, you spiraled, and now it's back. Beautiful arc.",
+  "Claude recovered. Pretend you were calm the whole time.",
+  "Everything's working again. That was a rough time for your confidence.",
+  "Resolved. Your temporary career in manual thinking is over.",
 ];
 
+const lastPicked = new WeakMap();
+
 function pick(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
+  const last = lastPicked.get(arr);
+  let idx;
+  do {
+    idx = Math.floor(Math.random() * arr.length);
+  } while (arr.length > 1 && idx === last);
+  lastPicked.set(arr, idx);
+  return arr[idx];
 }
 
 function el(tag, className, text) {
@@ -138,6 +159,7 @@ function render({ isDown, isCurrentlyDown, todayIncidents, data }) {
     document.title = "NO — Was Claude Down Today?";
   }
 
+  lastIsDown = isDown;
   updateFavicon(isDown);
 
   clearChildren(statusEl);
@@ -166,6 +188,12 @@ function render({ isDown, isCurrentlyDown, todayIncidents, data }) {
   }
 }
 
+function cssVar(name) {
+  return getComputedStyle(document.documentElement)
+    .getPropertyValue(name)
+    .trim();
+}
+
 function updateFavicon(isDown) {
   const size = 32;
   const canvas = document.createElement("canvas");
@@ -174,7 +202,7 @@ function updateFavicon(isDown) {
   const ctx = canvas.getContext("2d");
   ctx.beginPath();
   ctx.arc(size / 2, size / 2, size / 2 - 2, 0, Math.PI * 2);
-  ctx.fillStyle = isDown ? "#d97757" : "#788c5d";
+  ctx.fillStyle = isDown ? cssVar("--accent") : cssVar("--green");
   ctx.fill();
 
   let link = document.querySelector("link[rel='icon']");
@@ -231,6 +259,8 @@ async function refresh({ spin = false } = {}) {
   }
 }
 
+let lastIsDown = false;
+
 function init() {
   $("date").textContent = formatDate();
   setInterval(() => {
@@ -241,6 +271,10 @@ function init() {
   if (btn) {
     btn.addEventListener("click", () => refresh({ spin: true }));
   }
+
+  window
+    .matchMedia("(prefers-color-scheme: dark)")
+    .addEventListener("change", () => updateFavicon(lastIsDown));
 
   refresh();
   setInterval(refresh, REFRESH_MS);

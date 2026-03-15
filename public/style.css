@@ -1,11 +1,25 @@
 :root {
+  color-scheme: light dark;
   --bg: #faf9f5;
   --text: #141413;
   --muted: #9c8e7a;
   --accent: #d97757;
   --green: #788c5d;
   --border: #e8e2d9;
+  --red: #c0392b;
   --font: "Poppins", system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1b18;
+    --text: #ede8df;
+    --muted: #8a7e6c;
+    --accent: #e08a6d;
+    --green: #92ad6f;
+    --border: #33312c;
+    --red: #e05545;
+  }
 }
 
 *,
@@ -102,7 +116,7 @@ main {
 }
 
 .status-dot-down {
-  background: #c0392b;
+  background: var(--red);
 }
 
 .incidents {
