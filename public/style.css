@@ -155,10 +155,8 @@ main {
 }
 
 footer {
-  position: fixed;
-  bottom: 1.5rem;
-  left: 0;
-  right: 0;
+  margin-top: 2rem;
+  padding-bottom: 1.5rem;
   text-align: center;
 }
 
@@ -224,4 +222,126 @@ footer a:hover {
   color: var(--accent);
   text-decoration: none;
   border-bottom: 1px solid var(--accent);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.seo-content {
+  text-align: left;
+  max-width: 480px;
+  margin: 2rem auto;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.seo-content h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 1.5rem 0 0.6rem;
+}
+
+.seo-content h2:first-child {
+  margin-top: 0;
+}
+
+.seo-content p {
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+}
+
+.seo-content a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s;
+}
+
+.seo-content a:hover {
+  border-bottom-color: var(--accent);
+}
+
+.seo-content details {
+  border-top: 1px solid var(--border);
+  padding: 0.6rem 0;
+}
+
+.seo-content details:last-child {
+  border-bottom: 1px solid var(--border);
+}
+
+.seo-content summary {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  padding: 0.2rem 0;
+}
+
+.seo-content details p {
+  margin-top: 0.4rem;
+}
+
+.noscript-msg {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin: 1rem 0;
+}
+
+.noscript-msg a {
+  color: var(--accent);
+}
+
+.footer-sep {
+  color: var(--border);
+  margin: 0 0.3rem;
+}
+
+.back-link {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  border-bottom: 1px solid transparent;
+  transition: color 0.15s;
+}
+
+.back-link:hover {
+  color: var(--text);
+}
+
+.faq-title {
+  font-size: clamp(2rem, 8vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.faq-subtitle {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+}
+
+.faq-page-content {
+  border-top: none;
+  padding-top: 0;
+}
+
+.faq-intro {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
 }
