@@ -2,6 +2,7 @@ const SUMMARY_URL = "https://status.claude.com/api/v2/summary.json";
 const INCIDENTS_URL = "https://status.claude.com/api/v2/incidents.json";
 const DEFAULT_TIMEZONE = "UTC";
 const DAY_FORMATTERS = new Map();
+const INVALID_DAY_KEY = null;
 
 function normalizeTimeZone(timeZone) {
   if (typeof timeZone !== "string" || timeZone.trim() === "") {
@@ -33,7 +34,12 @@ function dayFormatter(timeZone) {
 }
 
 function dayKey(dateString, timeZone) {
-  const parts = dayFormatter(timeZone).formatToParts(new Date(dateString));
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) {
+    return INVALID_DAY_KEY;
+  }
+
+  const parts = dayFormatter(timeZone).formatToParts(date);
   const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
   return `${values.year}-${values.month}-${values.day}`;
 }
@@ -47,11 +53,21 @@ function getCurrentStatus(components) {
   const hasDegraded = components.some(
     (component) => component.status === "degraded_performance",
   );
+  const hasMaintenance = components.some(
+    (component) => component.status === "under_maintenance",
+  );
 
   if (hasOutage) {
     return {
       level: "down",
       label: "Outage right now",
+    };
+  }
+
+  if (hasMaintenance) {
+    return {
+      level: "maintenance",
+      label: "Maintenance right now",
     };
   }
 

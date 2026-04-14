@@ -1,5 +1,6 @@
 const REFRESH_MS = 60_000;
 let lastFaviconState = "pending";
+let isRefreshing = false;
 
 const $ = (id) => document.getElementById(id);
 
@@ -47,6 +48,10 @@ function formatTimestamp(dateString, timeZone = browserTimeZone()) {
 
 function getStatusDotClass(level) {
   if (level === "down") {
+    return "status-dot-down";
+  }
+
+  if (level === "maintenance") {
     return "status-dot-down";
   }
 
@@ -211,6 +216,11 @@ function renderError() {
 }
 
 async function refresh({ spin = false } = {}) {
+  if (isRefreshing) {
+    return;
+  }
+
+  isRefreshing = true;
   const button = $("refresh-btn");
   const icon = $("refresh-icon");
 
@@ -229,6 +239,8 @@ async function refresh({ spin = false } = {}) {
       button.disabled = false;
       icon.classList.remove("spinning");
     }
+
+    isRefreshing = false;
   }
 }
 
