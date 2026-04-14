@@ -1,129 +1,181 @@
 const SUMMARY_URL = "https://status.claude.com/api/v2/summary.json";
 const INCIDENTS_URL = "https://status.claude.com/api/v2/incidents.json";
+const DEFAULT_TIMEZONE = "UTC";
+const DAY_FORMATTERS = new Map();
 
-const QUIPS_NO = [
-    'You can go back to pretending you wrote that code yourself.',
-    'Your job is safe... for now.',
-    "All clear. Continue taking credit for Claude's work.",
-    "Still up. Nobody has to discover your fallback plan was 'guessing'.",
-    'No outage today. Your impostor syndrome lives to fight another day.',
-    'Crisis averted. You may resume outsourcing your thoughts.',
-];
+function normalizeTimeZone(timeZone) {
+  if (typeof timeZone !== "string" || timeZone.trim() === "") {
+    return DEFAULT_TIMEZONE;
+  }
 
-const QUIPS_YES_ACTIVE = [
-    'Time to find out if you actually know how to code.',
-    "Guess you'll have to read the docs yourself today.",
-    'Hope you remember how Stack Overflow works.',
-    'This is the part where you stare at your screen.',
-    "Looks like it's just you and your raw problem-solving skills now.",
-    'Claude is down. Time to cosplay as a competent engineer.',
-    "Hope you weren't too emotionally attached to AI writing your code.",
-    "You're on your own for a bit. Terrifying, I know.",
-    'Time to interact directly with the codebase. Condolences.',
-    'Claude is unavailable, which makes this a very hands-on learning experience.',
-];
-
-const QUIPS_YES_RESOLVED = [
-    'It was down, but it got back up. Unlike your motivation.',
-    'There was a blip. Nobody saw you panic. Right?',
-    "It's back. You can close that Stack Overflow tab now.",
-    "It broke, you spiraled, and now it's back. Beautiful arc.",
-    'Claude recovered. Pretend you were calm the whole time.',
-    "Everything's working again. That was a rough time for your confidence.",
-    'Resolved. Your temporary career in manual thinking is over.',
-];
-
-function pick(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone });
+    return timeZone;
+  } catch {
+    return DEFAULT_TIMEZONE;
+  }
 }
 
-function isSameDayUTC(dateStr, ref) {
-  const d = new Date(dateStr);
+function dayFormatter(timeZone) {
+  if (!DAY_FORMATTERS.has(timeZone)) {
+    DAY_FORMATTERS.set(
+      timeZone,
+      new Intl.DateTimeFormat("en-US", {
+        timeZone,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }),
+    );
+  }
+
+  return DAY_FORMATTERS.get(timeZone);
+}
+
+function dayKey(dateString, timeZone) {
+  const parts = dayFormatter(timeZone).formatToParts(new Date(dateString));
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function getCurrentStatus(components) {
+  const hasOutage = components.some(
+    (component) =>
+      component.status === "major_outage" ||
+      component.status === "partial_outage",
+  );
+  const hasDegraded = components.some(
+    (component) => component.status === "degraded_performance",
+  );
+
+  if (hasOutage) {
+    return {
+      level: "down",
+      label: "Outage right now",
+    };
+  }
+
+  if (hasDegraded) {
+    return {
+      level: "degraded",
+      label: "Degraded right now",
+    };
+  }
+
+  return {
+    level: "ok",
+    label: "All systems operational right now",
+  };
+}
+
+function getReason({ isDown, isCurrentlyDown }) {
+  if (!isDown) {
+    return "Anthropic reports Claude as operational right now.";
+  }
+
+  if (isCurrentlyDown) {
+    return "Anthropic reports an active Claude incident today.";
+  }
+
+  return "There was a Claude incident earlier today, and Anthropic has marked it resolved.";
+}
+
+function wantsJsonResponse(req) {
   return (
-    d.getUTCFullYear() === ref.getUTCFullYear() &&
-    d.getUTCMonth() === ref.getUTCMonth() &&
-    d.getUTCDate() === ref.getUTCDate()
+    req.query?.format === "json" ||
+    (req.headers.accept || "").includes("application/json")
   );
 }
 
 export default async function handler(req, res) {
+  const wantsJson = wantsJsonResponse(req);
+  const timeZone = normalizeTimeZone(req.query?.tz);
+
   try {
-    const [summaryRes, incidentsRes] = await Promise.all([
+    const [summaryResponse, incidentsResponse] = await Promise.all([
       fetch(SUMMARY_URL),
       fetch(INCIDENTS_URL),
     ]);
 
-    if (!summaryRes.ok || !incidentsRes.ok) {
-      res.status(502).json({ error: "Failed to reach status API" });
-      return;
+    if (!summaryResponse.ok || !incidentsResponse.ok) {
+      throw new Error("Failed to reach status API");
     }
 
-    const summary = await summaryRes.json();
-    const incidents = await incidentsRes.json();
+    const [summary, incidentsPayload] = await Promise.all([
+      summaryResponse.json(),
+      incidentsResponse.json(),
+    ]);
 
-    const today = new Date();
-
-    const todayIncidents = (incidents.incidents || []).filter(
-      (inc) =>
-        isSameDayUTC(inc.created_at, today) ||
-        isSameDayUTC(inc.updated_at, today) ||
-        (inc.incident_updates || []).some((u) =>
-          isSameDayUTC(u.created_at, today)
-        )
+    const checkedAt = new Date();
+    const incidents = incidentsPayload.incidents || [];
+    const components = summary.components || [];
+    const currentDay = dayKey(checkedAt.toISOString(), timeZone);
+    const todayIncidents = incidents.filter(
+      (incident) =>
+        dayKey(incident.created_at, timeZone) === currentDay ||
+        dayKey(incident.updated_at, timeZone) === currentDay ||
+        (incident.incident_updates || []).some((update) =>
+          dayKey(update.created_at, timeZone) === currentDay,
+        ),
     );
 
-    const hasActive = todayIncidents.some(
-      (inc) => inc.status !== "resolved" && inc.status !== "postmortem"
+    const hasActiveIncident = todayIncidents.some(
+      (incident) =>
+        incident.status !== "resolved" && incident.status !== "postmortem",
     );
-
-    const hasNonOperational = (summary.components || []).some(
-      (c) => c.status !== "operational"
-    );
-
-    const isDown = todayIncidents.length > 0 || hasNonOperational;
-    const isCurrentlyDown = hasActive || hasNonOperational;
-
-    const answer = isDown ? "YES" : "NO";
-    const reason = isDown
-      ? isCurrentlyDown
-        ? pick(QUIPS_YES_ACTIVE)
-        : pick(QUIPS_YES_RESOLVED)
-      : pick(QUIPS_NO);
+    const currentStatus = getCurrentStatus(components);
+    const isCurrentlyDown = hasActiveIncident || currentStatus.level !== "ok";
+    const isDown = todayIncidents.length > 0 || currentStatus.level !== "ok";
 
     const payload = {
-      down: isDown,
+      answer: isDown ? "YES" : "NO",
+      checked_at: checkedAt.toISOString(),
+      current_status: currentStatus,
       currently_down: isCurrentlyDown,
-      answer,
-      reason,
-      incidents: todayIncidents.map((inc) => ({
-        name: inc.name,
-        status: inc.status,
-        created_at: inc.created_at,
-        updated_at: inc.updated_at,
+      down: isDown,
+      incidents: todayIncidents.map((incident) => ({
+        created_at: incident.created_at,
+        name: incident.name,
+        status: incident.status,
+        updated_at: incident.updated_at,
       })),
+      reason: getReason({ isDown, isCurrentlyDown }),
+      timezone: timeZone,
     };
-
-    const wantsJson =
-      req.query.format === "json" ||
-      (req.headers.accept || "").includes("application/json");
 
     res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=30");
 
     if (wantsJson) {
-      res.setHeader("Content-Type", "application/json");
       res.status(200).json(payload);
-    } else {
-      res.setHeader("Content-Type", "text/plain; charset=utf-8");
-      let text = `${answer} — ${reason}`;
-      if (todayIncidents.length > 0) {
-        text += "\n\nIncidents:";
-        for (const inc of todayIncidents) {
-          text += `\n  - ${inc.name} (${inc.status})`;
-        }
-      }
-      res.status(200).send(text);
+      return;
     }
+
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    let text = `${payload.answer} — ${payload.reason}`;
+    text += `\nCurrent status: ${payload.current_status.label}`;
+    text += `\nIncident day: ${payload.timezone}`;
+
+    if (payload.incidents.length > 0) {
+      text += "\n\nIncidents:";
+      for (const incident of payload.incidents) {
+        text += `\n  - ${incident.name} (${incident.status})`;
+      }
+    }
+
+    res.status(200).send(text);
   } catch {
-    res.status(502).send("Failed to reach status API");
+    res.setHeader("Cache-Control", "no-store");
+
+    if (wantsJson) {
+      res.status(502).json({
+        error: "Failed to reach status API",
+        timezone: timeZone,
+      });
+      return;
+    }
+
+    res
+      .status(502)
+      .send("Failed to reach status API\nCurrent status source: status.claude.com");
   }
 }

@@ -4,39 +4,59 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <title>Was Claude Down Today? | Is Claude Down Right Now? — Live Status</title>
-  <meta name="description" content="Is Claude down right now? Check Claude AI's live status instantly. Real-time outage and incident monitoring for Claude by Anthropic — claude.ai, Claude API, and Claude Code.">
-  <meta name="keywords" content="is claude down, was claude down, claude down, claude status, claude outage, claude ai down, claude not working, claude not responding, claude 500 error, claude server status, claude api down, claude code not working, anthropic outage, anthropic status, claude down today, claude.ai down, claudedown, claude down right now, claude service disruption, claude downtime">
-  <link rel="canonical" href="https://wasclaudedown.today">
-  <meta name="theme-color" content="#faf9f5" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#1c1b18" media="(prefers-color-scheme: dark)">
-  <meta name="application-name" content="Was Claude Down Today?">
+  <title>Is Claude Down Right Now? | Live Claude Status</title>
+  <meta name="description" content="Check if Claude is down right now. Live Claude status from Anthropic's official status page, with updates for claude.ai, the Claude API, and Claude Code.">
+  <link rel="canonical" href="https://wasclaudedown.today/">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="theme-color" content="#f4f5f2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1b1c19" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="Live Claude Status">
 
   <!-- Open Graph -->
-  <meta property="og:title" content="Was Claude Down Today? — Live Claude AI Status Checker">
-  <meta property="og:description" content="Is Claude down? Check Claude AI status instantly. Live outage monitoring for claude.ai, Claude API, and Claude Code by Anthropic.">
+  <meta property="og:title" content="Is Claude Down Right Now? | Live Claude Status">
+  <meta property="og:description" content="Live Claude status from Anthropic's official status page for claude.ai, the Claude API, and Claude Code.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://wasclaudedown.today">
-  <meta property="og:site_name" content="Was Claude Down Today?">
+  <meta property="og:url" content="https://wasclaudedown.today/">
+  <meta property="og:site_name" content="Live Claude Status">
   <meta property="og:locale" content="en_US">
+  <meta property="og:image" content="https://wasclaudedown.today/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Live Claude status checker showing a YES or NO answer for Claude availability.">
 
   <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Was Claude Down Today? — Live Status">
-  <meta name="twitter:description" content="Is Claude down right now? Instant live status for Claude AI by Anthropic. Covers claude.ai, Claude API, and Claude Code.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Is Claude Down Right Now? | Live Claude Status">
+  <meta name="twitter:description" content="Check Claude's current status for claude.ai, the Claude API, and Claude Code.">
+  <meta name="twitter:image" content="https://wasclaudedown.today/og-image.png">
 
-  <!-- Structured Data: WebSite -->
+  <!-- Structured Data -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Was Claude Down Today?",
-    "alternateName": ["Is Claude Down", "Claude Status Checker", "Claude Down Checker", "Claude Outage Tracker"],
-    "url": "https://wasclaudedown.today",
-    "description": "Real-time status checker for Claude AI by Anthropic. Find out if Claude is down right now or was down today. Monitors claude.ai, Claude API, and Claude Code."
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "name": "Live Claude Status",
+        "alternateName": "Is Claude Down Right Now?",
+        "url": "https://wasclaudedown.today/"
+      },
+      {
+        "@type": "WebPage",
+        "name": "Is Claude Down Right Now?",
+        "url": "https://wasclaudedown.today/",
+        "description": "Live Claude status from Anthropic's official status page for claude.ai, the Claude API, and Claude Code.",
+        "isPartOf": {
+          "@type": "WebSite",
+          "url": "https://wasclaudedown.today/"
+        }
+      }
+    ]
   }
   </script>
 
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/og-image.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap">
@@ -44,7 +64,7 @@
 </head>
 <body>
   <main>
-    <h1 class="sr-only">Was Claude Down Today? — Live Claude AI Status Checker</h1>
+    <h1 class="hero-title">Is Claude Down Right Now?</h1>
 
     <p id="date" class="date"></p>
 
@@ -52,24 +72,27 @@
       <span class="answer-loading">&hellip;</span>
     </div>
 
-    <noscript>
-      <p class="noscript-msg">This site requires JavaScript to check Claude's live status. Visit <a href="https://status.claude.com">status.claude.com</a> directly to see if Claude is down.</p>
-    </noscript>
+    <p id="reason" class="reason">Official Anthropic status, refreshed every 60 seconds for claude.ai, API, and Claude Code.</p>
 
-    <p id="reason" class="reason"></p>
+    <noscript>
+      <p class="noscript-msg">JavaScript updates the live answer, but the official status source is still <a href="https://status.claude.com">status.claude.com</a>.</p>
+    </noscript>
 
     <div id="incidents" class="incidents"></div>
 
-    <p id="current-status" class="current-status"></p>
+    <p id="current-status" class="current-status">
+      <span class="status-dot status-dot-pending"></span>
+      Checking current status
+    </p>
 
     <button id="refresh-btn" class="refresh-btn" type="button" aria-label="Refresh Claude status">
       <span id="refresh-icon" class="refresh-icon">↻</span> Refresh
     </button>
 
     <footer>
-      <a href="https://status.claude.com" target="_blank" rel="noopener">Data from status.claude.com</a>
+      <a href="https://status.claude.com" target="_blank" rel="noopener">Official Claude Status</a>
       <span class="footer-sep">&middot;</span>
-      <a href="faq.html">FAQ</a>
+      <a href="/faq">FAQ</a>
     </footer>
   </main>
   <script src="app.js"></script>
