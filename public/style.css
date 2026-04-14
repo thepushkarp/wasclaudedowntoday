@@ -92,8 +92,18 @@ main {
   color: var(--muted);
   font-size: 1rem;
   line-height: 1.5;
-  margin: 0 auto 1.35rem;
+  margin: 0 auto 0.35rem;
   max-width: 30rem;
+}
+
+.quip {
+  color: var(--text);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  margin: 0 auto 1.5rem;
+  max-width: 28rem;
+  min-height: 1.3em;
+  opacity: 0.82;
 }
 
 .noscript-msg {
@@ -369,6 +379,11 @@ footer a:hover,
 
   .reason {
     font-size: 0.92rem;
+  }
+
+  .quip {
+    font-size: 0.84rem;
+    margin-bottom: 1.35rem;
   }
 
   .faq-title {

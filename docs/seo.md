@@ -22,6 +22,7 @@ Legacy `.html` URLs redirect permanently to the clean versions through
 - Keep the homepage `h1` visible in the initial HTML.
 - Keep the homepage explainer short and factual.
 - Keep local-time wording aligned between the homepage, FAQ, and API payload.
+- Keep `public/og-image.png` minimal and dark regardless of site theme.
 - Do not reintroduce `meta keywords`.
 - Keep the FAQ focused on secondary support intents, not general blog content.
 - Keep metadata and JSON-LD aligned with visible page content.

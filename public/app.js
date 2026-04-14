@@ -1,6 +1,34 @@
 const REFRESH_MS = 60_000;
 let lastFaviconState = "pending";
 let isRefreshing = false;
+const LAST_QUIP_INDEX = {
+  no: -1,
+  yesActive: -1,
+  yesResolved: -1,
+};
+const QUIPS = {
+  no: [
+    "You can go back to pretending you wrote that code yourself.",
+    "Your job is safe... for now.",
+    "All clear. Continue taking credit for Claude's work.",
+    "Still up. Nobody has to discover your fallback plan was guessing.",
+    "Crisis averted. You may resume outsourcing your thoughts.",
+  ],
+  yesActive: [
+    "Time to find out if you actually know how to code.",
+    "Guess you'll have to read the docs yourself today.",
+    "Hope you remember how Stack Overflow works.",
+    "You're on your own for a bit. Terrifying, I know.",
+    "Time to interact directly with the codebase. Condolences.",
+  ],
+  yesResolved: [
+    "It was down, but it got back up. Unlike your motivation.",
+    "There was a blip. Nobody saw you panic. Right?",
+    "It's back. You can close that Stack Overflow tab now.",
+    "Claude recovered. Pretend you were calm the whole time.",
+    "Resolved. Your temporary career in manual thinking is over.",
+  ],
+};
 
 const $ = (id) => document.getElementById(id);
 
@@ -65,6 +93,31 @@ function getStatusDotClass(level) {
 function incidentStatusText(status) {
   const normalized = status.replace(/_/g, " ");
   return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+}
+
+function pickQuip(key) {
+  const options = QUIPS[key];
+  const lastIndex = LAST_QUIP_INDEX[key];
+  let nextIndex = Math.floor(Math.random() * options.length);
+
+  if (options.length > 1 && nextIndex === lastIndex) {
+    nextIndex = (nextIndex + 1) % options.length;
+  }
+
+  LAST_QUIP_INDEX[key] = nextIndex;
+  return options[nextIndex];
+}
+
+function quipForPayload(payload) {
+  if (payload.answer !== "YES") {
+    return pickQuip("no");
+  }
+
+  if (payload.currently_down) {
+    return pickQuip("yesActive");
+  }
+
+  return pickQuip("yesResolved");
 }
 
 function cssVar(name) {
@@ -179,6 +232,7 @@ function renderIncidents(incidentsEl, payload) {
 function render(payload) {
   $("date").textContent = formatTimestamp(payload.checked_at, payload.timezone);
   $("reason").textContent = payload.reason;
+  $("quip").textContent = quipForPayload(payload);
   updateFavicon(payload.answer === "YES" ? "yes" : "no");
 
   renderStatus($("answer"), payload);
@@ -189,6 +243,7 @@ function render(payload) {
 function renderError() {
   const answerEl = $("answer");
   const reasonEl = $("reason");
+  const quipEl = $("quip");
   const statusEl = $("current-status");
   const incidentsEl = $("incidents");
 
@@ -206,6 +261,7 @@ function renderError() {
   link.textContent = "Check status.claude.com directly.";
   message.appendChild(link);
   reasonEl.appendChild(message);
+  quipEl.textContent = "";
 
   clearChildren(statusEl);
   statusEl.appendChild(el("span", "status-dot status-dot-pending"));
