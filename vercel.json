@@ -13,5 +13,73 @@
       "destination": "/faq",
       "permanent": true
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/",
+      "has": [
+        { "type": "header", "key": "accept", "value": ".*text/markdown.*" }
+      ],
+      "destination": "/index.md"
+    },
+    {
+      "source": "/faq",
+      "has": [
+        { "type": "header", "key": "accept", "value": ".*text/markdown.*" }
+      ],
+      "destination": "/faq.md"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/",
+      "headers": [
+        {
+          "key": "Link",
+          "value": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </api/status>; rel=\"service\"; type=\"application/json\", </docs/api>; rel=\"service-doc\"; type=\"text/html\", </docs/openapi.json>; rel=\"service-desc\"; type=\"application/openapi+json\", </.well-known/agent-skills/index.json>; rel=\"https://agentskills.io/rel/index\"; type=\"application/json\", </faq>; rel=\"help\""
+        },
+        { "key": "Vary", "value": "Accept" }
+      ]
+    },
+    {
+      "source": "/faq",
+      "headers": [
+        {
+          "key": "Link",
+          "value": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </api/status>; rel=\"service\"; type=\"application/json\", </>; rel=\"start\""
+        },
+        { "key": "Vary", "value": "Accept" }
+      ]
+    },
+    {
+      "source": "/api/status",
+      "headers": [
+        { "key": "Vary", "value": "Accept" }
+      ]
+    },
+    {
+      "source": "/.well-known/api-catalog",
+      "headers": [
+        { "key": "Content-Type", "value": "application/linkset+json; charset=utf-8" }
+      ]
+    },
+    {
+      "source": "/index.md",
+      "headers": [
+        { "key": "Content-Type", "value": "text/markdown; charset=utf-8" }
+      ]
+    },
+    {
+      "source": "/faq.md",
+      "headers": [
+        { "key": "Content-Type", "value": "text/markdown; charset=utf-8" }
+      ]
+    },
+    {
+      "source": "/.well-known/agent-skills/check-claude-status/SKILL.md",
+      "headers": [
+        { "key": "Content-Type", "value": "text/markdown; charset=utf-8" }
+      ]
+    }
   ]
 }

@@ -1,0 +1,25 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://wasclaudedown.today/api/status",
+      "service-desc": [
+        {
+          "href": "https://wasclaudedown.today/docs/openapi.json",
+          "type": "application/openapi+json"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://wasclaudedown.today/docs/api",
+          "type": "text/html"
+        }
+      ],
+      "status": [
+        {
+          "href": "https://wasclaudedown.today/api/status?format=json",
+          "type": "application/json"
+        }
+      ]
+    }
+  ]
+}

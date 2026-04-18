@@ -96,15 +96,51 @@ function getReason({ isDown, isCurrentlyDown }) {
   return "There was a Claude incident earlier today, and Anthropic has marked it resolved.";
 }
 
-function wantsJsonResponse(req) {
-  return (
-    req.query?.format === "json" ||
-    (req.headers.accept || "").includes("application/json")
-  );
+function responseFormat(req) {
+  const format = req.query?.format;
+  if (format === "json") {
+    return "json";
+  }
+  if (format === "markdown") {
+    return "markdown";
+  }
+
+  const accept = req.headers.accept || "";
+  if (accept.includes("application/json")) {
+    return "json";
+  }
+  if (accept.includes("text/markdown")) {
+    return "markdown";
+  }
+
+  return "text";
+}
+
+function formatIncidentStatus(status) {
+  const normalized = status.replace(/_/g, " ");
+  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+}
+
+function renderMarkdown(payload) {
+  let md = `# ${payload.answer} — Is Claude down?\n\n`;
+  md += `${payload.reason}\n\n`;
+  md += `- **Current status:** ${payload.current_status.label}\n`;
+  md += `- **Checked at:** ${payload.checked_at}\n`;
+  md += `- **Incident day timezone:** ${payload.timezone}\n`;
+
+  if (payload.incidents.length > 0) {
+    md += `\n## Incidents today\n\n`;
+    for (const incident of payload.incidents) {
+      md += `- **${incident.name}** — ${formatIncidentStatus(incident.status)} (updated ${incident.updated_at})\n`;
+    }
+  }
+
+  md += `\n---\n\nSource: https://status.claude.com · Docs: https://wasclaudedown.today/docs/api\n`;
+  return md;
 }
 
 export default async function handler(req, res) {
-  const wantsJson = wantsJsonResponse(req);
+  const format = responseFormat(req);
   const timeZone = normalizeTimeZone(req.query?.tz);
 
   try {
@@ -161,8 +197,14 @@ export default async function handler(req, res) {
 
     res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=30");
 
-    if (wantsJson) {
+    if (format === "json") {
       res.status(200).json(payload);
+      return;
+    }
+
+    if (format === "markdown") {
+      res.setHeader("Content-Type", "text/markdown; charset=utf-8");
+      res.status(200).send(renderMarkdown(payload));
       return;
     }
 
@@ -182,11 +224,21 @@ export default async function handler(req, res) {
   } catch {
     res.setHeader("Cache-Control", "no-store");
 
-    if (wantsJson) {
+    if (format === "json") {
       res.status(502).json({
         error: "Failed to reach status API",
         timezone: timeZone,
       });
+      return;
+    }
+
+    if (format === "markdown") {
+      res.setHeader("Content-Type", "text/markdown; charset=utf-8");
+      res
+        .status(502)
+        .send(
+          "# Error\n\nFailed to reach status API.\n\nSource: https://status.claude.com\n",
+        );
       return;
     }
 

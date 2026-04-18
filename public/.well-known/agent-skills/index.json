@@ -1,0 +1,12 @@
+{
+  "$schema": "https://agentskills.io/schema/v0.2.0/index.json",
+  "skills": [
+    {
+      "name": "check-claude-status",
+      "type": "skill",
+      "description": "Check whether Claude (claude.ai, Claude API, Claude Code) is currently down and list today's incidents.",
+      "url": "https://wasclaudedown.today/.well-known/agent-skills/check-claude-status/SKILL.md",
+      "sha256": "71afb54337ed1002f7b3122518fc97957a766b11901dd3125a3a53ef6914665a"
+    }
+  ]
+}

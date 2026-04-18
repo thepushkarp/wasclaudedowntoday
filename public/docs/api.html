@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>API Docs — Was Claude Down Today</title>
+  <meta name="description" content="HTTP API for checking whether Claude is currently down. Returns JSON, plain text, or markdown.">
+  <link rel="canonical" href="https://wasclaudedown.today/docs/api">
+  <meta name="robots" content="index, follow">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main>
+    <h1 class="hero-title">Status API</h1>
+    <p class="reason">Programmatic access to the same data the homepage shows. Aggregated from <a href="https://status.claude.com">status.claude.com</a>.</p>
+
+    <section>
+      <h2>Endpoint</h2>
+      <p><code>GET https://wasclaudedown.today/api/status</code></p>
+
+      <h2>Query parameters</h2>
+      <ul>
+        <li><code>format</code> — <code>json</code> or <code>markdown</code>. Optional; falls back to <code>Accept</code> header.</li>
+        <li><code>tz</code> — IANA timezone (e.g. <code>America/New_York</code>) used to determine what &ldquo;today&rdquo; means. Defaults to UTC.</li>
+      </ul>
+
+      <h2>Content negotiation</h2>
+      <ul>
+        <li><code>Accept: application/json</code> &rarr; JSON body</li>
+        <li><code>Accept: text/markdown</code> &rarr; Markdown body</li>
+        <li>Anything else &rarr; plain text</li>
+      </ul>
+
+      <h2>Example</h2>
+      <pre><code>curl -H "Accept: application/json" \
+  "https://wasclaudedown.today/api/status?tz=America/New_York"</code></pre>
+
+      <h2>Response (JSON)</h2>
+      <pre><code>{
+  "answer": "NO",
+  "checked_at": "2026-04-18T12:34:56.000Z",
+  "current_status": { "level": "ok", "label": "All systems operational right now" },
+  "currently_down": false,
+  "down": false,
+  "incidents": [],
+  "reason": "Anthropic reports Claude as operational right now.",
+  "timezone": "America/New_York"
+}</code></pre>
+
+      <h2>Discovery</h2>
+      <ul>
+        <li>API catalog: <a href="/.well-known/api-catalog">/.well-known/api-catalog</a> (RFC 9727)</li>
+        <li>OpenAPI spec: <a href="/docs/openapi.json">/docs/openapi.json</a></li>
+        <li>Agent skills: <a href="/.well-known/agent-skills/index.json">/.well-known/agent-skills/index.json</a></li>
+      </ul>
+    </section>
+
+    <footer>
+      <a href="/">Home</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/faq">FAQ</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://status.claude.com" target="_blank" rel="noopener">Official Claude Status</a>
+    </footer>
+  </main>
+</body>
+</html>
