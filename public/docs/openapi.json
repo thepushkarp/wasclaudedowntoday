@@ -1,0 +1,90 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Was Claude Down Today — Status API",
+    "version": "1.0.0",
+    "description": "Returns a YES/NO answer for whether Claude (claude.ai, Claude API, Claude Code) is currently down, based on Anthropic's official status page.",
+    "contact": {
+      "url": "https://wasclaudedown.today/"
+    }
+  },
+  "servers": [
+    { "url": "https://wasclaudedown.today" }
+  ],
+  "paths": {
+    "/api/status": {
+      "get": {
+        "summary": "Check Claude status",
+        "description": "Aggregates status.claude.com summary + incidents and returns a plain YES/NO answer with today's incidents for the requested timezone.",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "enum": ["json", "markdown"] },
+            "description": "Force a response format. If omitted, the Accept header is used (application/json → JSON, text/markdown → Markdown, otherwise plain text)."
+          },
+          {
+            "name": "tz",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "example": "America/New_York" },
+            "description": "IANA timezone name used to decide what 'today' means. Defaults to UTC."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current Claude status.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/StatusResponse" }
+              },
+              "text/plain": { "schema": { "type": "string" } },
+              "text/markdown": { "schema": { "type": "string" } }
+            }
+          },
+          "502": {
+            "description": "Upstream status.claude.com could not be reached."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "StatusResponse": {
+        "type": "object",
+        "required": ["answer", "checked_at", "current_status", "currently_down", "down", "incidents", "reason", "timezone"],
+        "properties": {
+          "answer": { "type": "string", "enum": ["YES", "NO"] },
+          "checked_at": { "type": "string", "format": "date-time" },
+          "current_status": {
+            "type": "object",
+            "required": ["level", "label"],
+            "properties": {
+              "level": { "type": "string", "enum": ["ok", "degraded", "maintenance", "down"] },
+              "label": { "type": "string" }
+            }
+          },
+          "currently_down": { "type": "boolean" },
+          "down": { "type": "boolean" },
+          "incidents": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["name", "status", "created_at", "updated_at"],
+              "properties": {
+                "name": { "type": "string" },
+                "status": { "type": "string", "enum": ["investigating", "identified", "monitoring", "resolved", "postmortem"] },
+                "created_at": { "type": "string", "format": "date-time" },
+                "updated_at": { "type": "string", "format": "date-time" }
+              }
+            }
+          },
+          "reason": { "type": "string" },
+          "timezone": { "type": "string" }
+        }
+      }
+    }
+  }
+}

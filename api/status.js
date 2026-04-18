@@ -103,8 +103,34 @@ function wantsJsonResponse(req) {
   );
 }
 
+function wantsMarkdownResponse(req) {
+  return (
+    req.query?.format === "markdown" ||
+    (req.headers.accept || "").includes("text/markdown")
+  );
+}
+
+function renderMarkdown(payload) {
+  let md = `# ${payload.answer} — Is Claude down?\n\n`;
+  md += `${payload.reason}\n\n`;
+  md += `- **Current status:** ${payload.current_status.label}\n`;
+  md += `- **Checked at:** ${payload.checked_at}\n`;
+  md += `- **Incident day timezone:** ${payload.timezone}\n`;
+
+  if (payload.incidents.length > 0) {
+    md += `\n## Incidents today\n\n`;
+    for (const incident of payload.incidents) {
+      md += `- **${incident.name}** — ${incident.status} (updated ${incident.updated_at})\n`;
+    }
+  }
+
+  md += `\n---\n\nSource: https://status.claude.com · Docs: https://wasclaudedown.today/docs/api\n`;
+  return md;
+}
+
 export default async function handler(req, res) {
   const wantsJson = wantsJsonResponse(req);
+  const wantsMarkdown = !wantsJson && wantsMarkdownResponse(req);
   const timeZone = normalizeTimeZone(req.query?.tz);
 
   try {
@@ -166,6 +192,12 @@ export default async function handler(req, res) {
       return;
     }
 
+    if (wantsMarkdown) {
+      res.setHeader("Content-Type", "text/markdown; charset=utf-8");
+      res.status(200).send(renderMarkdown(payload));
+      return;
+    }
+
     res.setHeader("Content-Type", "text/plain; charset=utf-8");
     let text = `${payload.answer} — ${payload.reason}`;
     text += `\nCurrent status: ${payload.current_status.label}`;
@@ -187,6 +219,16 @@ export default async function handler(req, res) {
         error: "Failed to reach status API",
         timezone: timeZone,
       });
+      return;
+    }
+
+    if (wantsMarkdown) {
+      res.setHeader("Content-Type", "text/markdown; charset=utf-8");
+      res
+        .status(502)
+        .send(
+          "# Error\n\nFailed to reach status API.\n\nSource: https://status.claude.com\n",
+        );
       return;
     }
 

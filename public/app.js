@@ -315,3 +315,50 @@ function init() {
 }
 
 init();
+
+function registerWebMcp() {
+  if (!navigator?.modelContext?.provideContext) {
+    return;
+  }
+
+  try {
+    navigator.modelContext.provideContext({
+      tools: [
+        {
+          name: "get-claude-status",
+          description:
+            "Check whether Claude (claude.ai, Claude API, Claude Code) is currently down and list today's incidents. Aggregated from status.claude.com.",
+          inputSchema: {
+            type: "object",
+            properties: {
+              timezone: {
+                type: "string",
+                description:
+                  "Optional IANA timezone name (e.g. 'America/New_York') used to decide what 'today' means. Defaults to the browser timezone.",
+              },
+            },
+          },
+          async execute(input) {
+            const tz =
+              (input && typeof input.timezone === "string" && input.timezone) ||
+              browserTimeZone();
+            const params = new URLSearchParams({ format: "json", tz });
+            const response = await fetch(`/api/status?${params.toString()}`, {
+              headers: { Accept: "application/json" },
+            });
+
+            if (!response.ok) {
+              throw new Error(`Status API returned HTTP ${response.status}`);
+            }
+
+            return response.json();
+          },
+        },
+      ],
+    });
+  } catch {
+    // WebMCP registration is best-effort; never break the page.
+  }
+}
+
+registerWebMcp();
