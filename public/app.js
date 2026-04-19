@@ -192,14 +192,6 @@ function answerClassForPayload(payload) {
   return isResolvedIncident ? "answer-yes-resolved" : "answer-yes";
 }
 
-function pageStateForPayload(payload) {
-  if (payload.answer !== "YES") {
-    return "no";
-  }
-
-  return payload.currently_down ? "yes-active" : "yes-resolved";
-}
-
 function renderStatus(answerEl, payload) {
   clearChildren(answerEl);
   answerEl.appendChild(
@@ -241,7 +233,6 @@ function renderIncidents(incidentsEl, payload) {
 }
 
 function render(payload) {
-  document.body.dataset.claudeState = pageStateForPayload(payload);
   $("date").textContent = formatTimestamp(payload.checked_at, payload.timezone);
   $("reason").textContent = payload.reason;
   $("quip").textContent = quipForPayload(payload);
@@ -259,7 +250,6 @@ function renderError() {
   const statusEl = $("current-status");
   const incidentsEl = $("incidents");
 
-  document.body.dataset.claudeState = "error";
   $("date").textContent = "Status check failed · Local time";
 
   clearChildren(answerEl);
