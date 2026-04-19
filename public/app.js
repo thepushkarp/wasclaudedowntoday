@@ -183,17 +183,28 @@ async function fetchStatus() {
   return response.json();
 }
 
-function renderStatus(answerEl, payload) {
-  clearChildren(answerEl);
-
+function answerClassForPayload(payload) {
   const isResolvedIncident = payload.down && !payload.currently_down;
-  let answerClass = "answer-no";
-
-  if (payload.answer === "YES") {
-    answerClass = isResolvedIncident ? "answer-yes-resolved" : "answer-yes";
+  if (payload.answer !== "YES") {
+    return "answer-no";
   }
 
-  answerEl.appendChild(el("span", `answer-word ${answerClass}`, payload.answer));
+  return isResolvedIncident ? "answer-yes-resolved" : "answer-yes";
+}
+
+function pageStateForPayload(payload) {
+  if (payload.answer !== "YES") {
+    return "no";
+  }
+
+  return payload.currently_down ? "yes-active" : "yes-resolved";
+}
+
+function renderStatus(answerEl, payload) {
+  clearChildren(answerEl);
+  answerEl.appendChild(
+    el("span", `answer-word ${answerClassForPayload(payload)}`, payload.answer),
+  );
 }
 
 function renderCurrentStatus(statusEl, payload) {
@@ -230,6 +241,7 @@ function renderIncidents(incidentsEl, payload) {
 }
 
 function render(payload) {
+  document.body.dataset.claudeState = pageStateForPayload(payload);
   $("date").textContent = formatTimestamp(payload.checked_at, payload.timezone);
   $("reason").textContent = payload.reason;
   $("quip").textContent = quipForPayload(payload);
@@ -247,6 +259,7 @@ function renderError() {
   const statusEl = $("current-status");
   const incidentsEl = $("incidents");
 
+  document.body.dataset.claudeState = "error";
   $("date").textContent = "Status check failed · Local time";
 
   clearChildren(answerEl);
