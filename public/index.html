@@ -8,7 +8,7 @@
   <meta name="description" content="Check if Claude is down right now. Live Claude status from Anthropic's official status page, with updates for claude.ai, the Claude API, and Claude Code.">
   <link rel="canonical" href="https://wasclaudedown.today/">
   <meta name="robots" content="index, follow, max-image-preview:large">
-  <meta name="theme-color" content="#f4f5f2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#faf9f5" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1b1c19" media="(prefers-color-scheme: dark)">
   <meta name="application-name" content="Live Claude Status">
 
@@ -59,41 +59,59 @@
   <link rel="apple-touch-icon" href="/og-image.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&family=Lora:wght@400;500;600;700&family=Poppins:wght@400;500;600;800;900&display=swap">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <main>
-    <h1 class="hero-title">Is Claude Down Right Now?</h1>
+<body class="page-home">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        wasclaudedown.today
+      </div>
+      <p id="date" class="live-stamp">Checking live status...</p>
+    </header>
 
-    <p id="date" class="date"></p>
+    <section class="stage" aria-labelledby="hero-title">
+      <div class="hero-question">
+        <h1 id="hero-title" class="hero-title">Is Claude Down Right Now?</h1>
+      </div>
 
-    <div id="answer" class="answer" aria-live="polite">
-      <span class="answer-loading">&hellip;</span>
-    </div>
+      <div id="answer" class="answer" aria-live="polite">
+        <span class="answer-loading">&hellip;</span>
+      </div>
 
-    <p id="reason" class="reason">Official Anthropic status, refreshed every 60 seconds for claude.ai, API, and Claude Code.</p>
-    <p id="quip" class="quip" aria-live="polite"></p>
+      <div class="supporting-copy">
+        <p id="reason" class="reason">Official Anthropic status, refreshed every 60 seconds for claude.ai, API, and Claude Code.</p>
+        <p id="quip" class="quip" aria-live="polite"></p>
+      </div>
 
-    <noscript>
-      <p class="noscript-msg">JavaScript updates the live answer, but the official status source is still <a href="https://status.claude.com">status.claude.com</a>.</p>
-    </noscript>
+      <div class="status-row">
+        <p id="current-status" class="current-status">
+          <span class="status-dot status-dot-pending"></span>
+          Checking current status
+        </p>
 
-    <div id="incidents" class="incidents"></div>
+        <button id="refresh-btn" class="refresh-btn" type="button" aria-label="Refresh Claude status">
+          <span id="refresh-icon" class="refresh-icon">↻</span>
+          Refresh
+        </button>
+      </div>
 
-    <p id="current-status" class="current-status">
-      <span class="status-dot status-dot-pending"></span>
-      Checking current status
-    </p>
+      <noscript>
+        <div class="noscript">
+          <p class="noscript-msg">JavaScript updates the live answer, but the official status source is still <a href="https://status.claude.com">status.claude.com</a>.</p>
+        </div>
+      </noscript>
 
-    <button id="refresh-btn" class="refresh-btn" type="button" aria-label="Refresh Claude status">
-      <span id="refresh-icon" class="refresh-icon">↻</span> Refresh
-    </button>
+      <div id="incidents" class="incidents"></div>
+    </section>
 
-    <footer>
-      <a href="https://status.claude.com" target="_blank" rel="noopener">Official Claude Status</a>
-      <span class="footer-sep">&middot;</span>
-      <a href="/faq">FAQ</a>
+    <footer class="footer">
+      <p>Live data from <a href="https://status.claude.com" target="_blank" rel="noopener">status.claude.com</a></p>
+      <div class="footer-links">
+        <a href="/faq">FAQ</a>
+      </div>
     </footer>
   </main>
   <script src="app.js"></script>

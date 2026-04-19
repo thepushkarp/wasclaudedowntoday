@@ -8,7 +8,7 @@
   <meta name="description" content="Claude status FAQ covering Claude outages, Claude API incidents, Claude Code issues, and common errors like Claude 500 failures.">
   <link rel="canonical" href="https://wasclaudedown.today/faq">
   <meta name="robots" content="index, follow, max-image-preview:large">
-  <meta name="theme-color" content="#f4f5f2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#faf9f5" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1b1c19" media="(prefers-color-scheme: dark)">
 
   <!-- Open Graph -->
@@ -138,15 +138,17 @@
   <link rel="apple-touch-icon" href="/og-image.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&family=Lora:wght@400;500;600;700&family=Poppins:wght@400;500;600;800;900&display=swap">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <main>
-    <p class="date"><a href="/" class="back-link">&larr; Live Claude status checker</a></p>
-
-    <h1 class="faq-title">Claude Status FAQ</h1>
-    <p class="faq-subtitle">Outages, API incidents, Claude Code issues, and common errors.</p>
+<body class="page-faq">
+  <main class="faq-shell">
+    <header class="faq-header">
+      <a href="/" class="back-link">&larr; Live Claude status checker</a>
+      <p class="eyebrow">Common outage questions</p>
+      <h1 class="faq-title">Claude Status FAQ</h1>
+      <p class="faq-subtitle">Outages, API incidents, Claude Code issues, and common errors.</p>
+    </header>
 
     <nav class="faq-toc" aria-label="FAQ sections">
       <p class="faq-toc-label">Jump to</p>
@@ -240,10 +242,11 @@
       </details>
     </section>
 
-    <footer>
-      <a href="/">Live Claude status checker</a>
-      <span class="footer-sep">&middot;</span>
-      <a href="https://status.claude.com" target="_blank" rel="noopener">Official Anthropic status</a>
+    <footer class="footer">
+      <p>Live data from <a href="https://status.claude.com" target="_blank" rel="noopener">status.claude.com</a></p>
+      <div class="footer-links">
+        <a href="/">Live Claude status checker</a>
+      </div>
     </footer>
   </main>
 </body>
