@@ -39,15 +39,18 @@
   box-sizing: border-box;
 }
 
-body,
-h1,
-h2,
-p,
-ul {
+.page-home h1,
+.page-home p,
+.page-home ul,
+.page-faq h1,
+.page-faq h2,
+.page-faq p,
+.page-faq ul {
   margin: 0;
 }
 
-ul {
+.page-home ul,
+.page-faq ul {
   padding: 0;
 }
 
