@@ -1,4 +1,4 @@
-# Is Claude Down Right Now?
+# Was Claude Down Today?
 
 Live Claude status from Anthropic's official status page, for claude.ai, the Claude API, and Claude Code.
 
